@@ -1,5 +1,10 @@
 set fish_greeting ""
 
+set PATH $HOME/tools/llvm-project/build/bin $PATH
+set LD_LIBRARY_PATH $HOME/tools/llvm-project/build/lib $LD_LIBRARY_PATH
+
+set LANG en_US.UTF-8
+
 function inst
     sudo apt update
     sudo apt install $argv
@@ -33,3 +38,9 @@ end
 function sr
     eval $argv > /dev/null 2>&1 &
 end
+
+alias v 'nvim'
+alias ls 'exa -al --color=always --group-directories-first --git -s=old' # my preferred listing
+alias la 'exa -a --color=always --group-directories-first --git -s=old --header --long'  # all files and dirs
+alias ll 'exa -l --color=always --group-directories-first --git -s=old'  # long format
+alias lt 'exa -aT --color=always --group-directories-first --git -s=old' # tree listing
