@@ -20,6 +20,9 @@ cd gits
 wget https://cmake.org/files/v$version/cmake-$version.$build.tar.gz
 tar -xzvf cmake-$version.$build.tar.gz
 cd cmake-$version.$build/
+./bootstrap
+make -j$(nproc)
+sudo make install
 
 # install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs >> rustup.sh
@@ -44,6 +47,8 @@ cp -rv ~/Dotfiles-2/config/nvim/init.vim  ~/.config/nvim/init.vim
 
 # install Fisher plugin
 curl https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish
+fisher add rafaelrinaldi/pure
+fisher add patrickf3139/fzf.fish
 
 # Install NeoVim
 wget --quiet https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage --output-document nvim
