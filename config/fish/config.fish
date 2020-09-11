@@ -1,12 +1,4 @@
 set fish_greeting ""
-bind \ct kill-word
-
-function fish_prompt
-    set_color $fish_color_cwd
-    echo -n (prompt_pwd)
-    set_color normal
-    echo -n ' % '
-end
 
 function inst
     sudo apt update
@@ -20,14 +12,6 @@ end
 function upgrade
     sudo apt update
     sudo apt upgrade
-end
-
-function vimu
-    pip install -U pynvim
-    vim +BundleUpdate
-    cd ~/.vim/bundle/YouCompleteMe
-    python3 install.py --clang-completer
-    cd -
 end
 
 function dlaudio
@@ -49,13 +33,3 @@ end
 function sr
     eval $argv > /dev/null 2>&1 &
 end
-
-alias vim "nvim"
-alias vi "nvim"
-alias open "xdg-open"
-alias R "R --no-save --no-restore --quiet"
-
-# >>> conda initialize >>>
-# eval /home/user/anaconda3/bin/conda "shell.fish" "hook" $argv | source
-# <<< conda initialize <<<
-
