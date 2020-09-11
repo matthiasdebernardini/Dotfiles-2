@@ -1,82 +1,68 @@
-#!/bin/bash
+#!/usr/bin/bash
+set -ex
+
+mkdir gits
 
 ## Install Core Packages
+sudo apt-add-repository ppa:fish-shell/release-3
 sudo apt update
 sudo apt upgrade -y
-sudo apt install -y git cmake build-essential silversearcher-ag exuberant-ctags
-sudo apt install -y software-properties-common
-sudo apt install -y fish neovim tmux fzf
-sudo apt install -y golang
-sudo apt install -y python3-dev python3-pip python3-tk
+sudo apt install -y build-essential exuberant-ctags
+sudo apt install -y software-properties-common libssl-dev
+sudo apt install -y tmux fish
+sudo apt install -y fuse libfuse2 git python3-pip ack-grep
+sudo apt purge --auto-remove cmake
 
-# Configure Golang
-mkdir ~/go
-grep -q -F 'GOPATH' ~/.bashrc || echo 'export GOPATH="/home/$(whoami)/go"' >> ~/.bashrc
+# install CMake
+version=3.18
+build=1
+mkdir ~/temp
+cd ~/temp
+wget https://cmake.org/files/v$version/cmake-$version.$build.tar.gz
+tar -xzvf cmake-$version.$build.tar.gz
+cd cmake-$version.$build/
 
-# Enable Fish by Default
-grep -q -F 'fish' ~/.bashrc || echo 'exec fish' >> ~/.bashrc
+# install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs >> rustup.sh
+sh rustup.sh --help
+source $HOME/.cargo/env
+cargo install --locked bat
+cargo install ripgrep sd exa fd-find bandwhich 
 
-sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
-sudo update-alternatives --config vi
-sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
-sudo update-alternatives --config vim
-sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
-sudo update-alternatives --config editor
+# install LLVM
+git clone https://github.com/llvm/llvm-project.git
+cd llvm-project
+mkdir build && cd build
+cmake -DLLVM_ENABLE_PROJECTS=clang -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release  ../llvm
+make -j$(nproc)
 
 # Install dotfiles
 echo "Installing dotfiles..."
 mkdir -p ~/.config/fish
 mkdir -p ~/.config/nvim
-cp -rv ../../config/fish/config.fish ~/.config/fish/config.fish
-cp -rv ../../config/nvim/init.vim  ~/.config/nvim/init.vim
-cp -rv ../../config/tmux/tmux.conf ~/.tmux.conf
+cp -rv ~/Dotfiles-2/config/fish/config.fish ~/.config/fish/config.fish
+cp -rv ~/Dotfiles-2/config/nvim/init.vim  ~/.config/nvim/init.vim
 
-## Install Tmux Plugin Manager
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# install Fisher plugin
+curl https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish
+
+# Install NeoVim
+wget --quiet https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage --output-document nvim
+
+chmod +x nvim
+sudo chown root:root nvim
+sudo mv nvim /usr/bin
+
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+pip3 install --user neovim
 
 ## Configuring Vim
 echo "Configuring NeoVim..."
-mkdir -p ~/.vim
-cd ~/.vim
-mkdir -p tmp
-cd tmp/
-mkdir -p swap
-mkdir -p undo
-mkdir -p backup
-cd
+mkdir -p ~/.vim/tmp/{swap, undo, backup}
 
-# install neovim python support
-pip3 install pynvim
-
-# install vundle
-git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-vim +BundleInstall
-
-# install YCM
-cd ~/.vim/bundle/YouCompleteMe && python3 install.py && cd
-#python3 install.py --gocode-completer --clang-completer
-
-# install js autocompletion (if you need newer node.js, install nvm instead)
-#sudo apt install nodejs npm -y
-#cd ~/.vim/bundle/tern_for_vim/
-#npm install
-#sudo npm install -g jshint
-
-# # Install Fish package manager
-# curl https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish
-
-# # Install fzf fish support
-# exec fish
-## older one, unmaintained
-# fisher add jethrokuan/fzf
-## newer one, not working
-# sudo apt install -y bat fd-find fzf
-# fisher add patrickf3139/fzf.fish
-
-# Another option is to use fzf extension
-sudo apt remove -y fzf
+# Install FZF from source
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
-
 
 echo "All Done."
