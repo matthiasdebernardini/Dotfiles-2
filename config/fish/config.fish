@@ -1,7 +1,7 @@
 set fish_greeting ""
 
-set PATH $HOME/tools/llvm-project/build/bin $PATH
-set LD_LIBRARY_PATH $HOME/tools/llvm-project/build/lib $LD_LIBRARY_PATH
+set PATH $HOME/gits/llvm-project/build/bin $PATH
+set LD_LIBRARY_PATH $HOME/gits/llvm-project/build/lib $LD_LIBRARY_PATH
 
 set LANG en_US.UTF-8
 
